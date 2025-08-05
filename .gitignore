@@ -1,0 +1,9 @@
+# Ignora arquivos de sistema do macOS
+.DS_Store
+
+# Ignora pastas de dependências
+node_modules/
+
+# Ignora arquivos de log e temporários
+*.log
+tmp/
