@@ -1,14 +1,421 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Meu Projeto Web</title>
-    <link rel="stylesheet" href="assets/css/style.css" />
+    <title>Gerenciador de Risco Day Trade</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
   </head>
   <body>
-    <h1>Olá do meu Projeto Web!</h1>
+    <!-- Barra de Navegação -->
+    <nav class="navbar">
+      <div class="nav-left">
+        <i class="fas fa-chart-line"></i>
+        <span class="nav-title">Gestão de Risco Day Trade</span>
+      </div>
+      <div class="nav-center">
+        <div class="user-name-section">
+          <i class="fas fa-user"></i>
+          <span id="user-name-display"
+            >ID: <span id="user-id">Carregando...</span></span
+          >
+        </div>
+      </div>
+      <div class="nav-right">
+        
+        <button class="nav-btn" onclick="userManager.switchUser()">
+          <i class="fas fa-user-plus"></i> Novo Usuário
+        </button>
+        <button class="nav-btn" onclick="exportData()">
+          <i class="fas fa-download"></i> Exportar
+        </button>
+        <button class="nav-btn">Compartilhar</button>
+      
+      </div>
+    </nav>
 
+    <!-- Container Principal -->
+    <div class="main-container">
+      
+    <!-- Resumo do Mês -->
+    <div class="full-width-container">
+      <div class="monthly-impostos">
+        <div class="summary-header">
+          <h2>Impostos e taxas</h2>
+        </div>
+
+        <div class="summary-stats">
+          <div class="stat-item">
+            <label>Impostos a Pagar:</label>
+            <span id="impostos-a-pagar" class="display-value">R$ 0,00</span>
+          </div>
+          <div class="stat-item">
+            <label>IR descontado:</label>
+            <span id="ir-descontado" class="display-value">R$ 0,00</span>
+          </div>
+          <div class="stat-item">
+            <label>Taxa Pagas WDO:</label>
+            <span id="taxa-wdo-acumulado" class="display-value">R$ 0,00</span>
+          </div>
+          <div class="stat-item">
+            <label>Taxa Pagas WIN:</label>
+            <span id="taxa-win-acumulado" class="display-value">R$ 0,00</span>
+          </div>
+          <div class="stat-item">
+            <label>Taxa Pagas BIT:</label>
+            <span id="taxa-bit-acumulado" class="display-value">R$ 0,00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+      <!-- Layout Principal -->
+      <div class="main-layout">
+        <!-- Container dos Painéis da Esquerda -->
+        <div class="left-panels-container">
+          <!-- Container dos 2 Painéis Superiores da Esquerda -->
+          <div class="top-left-panels">
+            <!-- Painel de Controle -->
+            <div class="control-panel">
+              <h2>Painel de Controle</h2>
+
+              <!-- Bloco 1: Configurações Básicas -->
+              <div class="panel-block">
+                <h3>Configurações Básicas</h3>
+                <div class="input-row">
+                  <div class="input-group">
+                    <label for="aporte-inicial">Aporte Inicial (R$):</label>
+                    <input
+                      type="number"
+                      id="aporte-inicial"
+                      value=""
+                      min="0"
+                      step="0.01"
+                      placeholder="0,00"
+                    />
+                  </div>
+
+                  <div class="input-group">
+                    <label for="percentual-trade">Percentual Por Trade (%):</label>
+                    <input
+                      type="number"
+                      id="percentual-trade"
+                      value=""
+                      min="0"
+                      max="100"
+                      step="0.50"
+                      placeholder="0 - %"
+                    />
+                  </div>
+                </div>
+
+                <div class="input-row">
+                  <div class="input-group">
+                    <label for="risco-diario">Risco Máximo Diário (R$):</label>
+                    <input
+                      type="number"
+                      id="risco-diario"
+                      value=""
+                      min="0"
+                      step="0.01"
+                      placeholder="0,00"
+                    />
+                  </div>
+
+                  <div class="input-group">
+                    <label for="risco-mensal">Risco Máximo Mensal (R$):</label>
+                    <input
+                      type="number"
+                      id="risco-mensal"
+                      value=""
+                      min="0"
+                      step="0.01"
+                      placeholder="0,00"
+                    />
+                  </div>
+                </div>
+
+                <div class="input-row">
+                    <div class="display-group">
+                      <label>Saldo Atual:</label>
+                      <span id="saldo-atual" class="display-value positive"
+                        >R$ 0,00</span
+                      >
+                    </div>
+
+                    <div class="display-group">
+                      <label>Permitido por Trade:</label>
+                      <span id="valor-permitido" class="display-value warning"
+                        >R$ 0,00</span
+                      >
+                    </div>
+                </div>
+
+                <button id="salvar-config" class="btn-primary">
+                  <i class="fas fa-save"></i> Salvar Configurações
+                </button>
+              </div>
+            </div>
+
+            <!-- Painel Taxas e Operações -->
+            <div class="control-panel">
+              <h2>Taxas e Operações</h2>
+
+              <!-- Bloco 1: Taxas -->
+              <div class="panel-block">
+                <h3>Taxas de Contratos</h3>
+                <div class="input-row">
+                  <div class="input-group">
+                    <label for="taxa-wdo">WDO (R$):</label>
+                    <input
+                      type="number"
+                      id="taxa-wdo"
+                      value=""
+                      min="0"
+                      step="0.01"
+                      placeholder="0,00"
+                    />
+                  </div>
+
+                  <div class="input-group">
+                    <label for="taxa-win">WIN (R$):</label>
+                    <input
+                      type="number"
+                      id="taxa-win"
+                      value=""
+                      min="0"
+                      step="0.01"
+                      placeholder="0,00"
+                    />
+                  </div>
+
+                  <div class="input-group">
+                    <label for="taxa-bit">BIT (R$):</label>
+                    <input
+                      type="number"
+                      id="taxa-bit"
+                      value=""
+                      min="0"
+                      step="0.01"
+                      placeholder="0,00"
+                    />
+                  </div>
+                </div>
+
+                <button id="salvar-taxas" class="btn-secondary">
+                  <i class="fas fa-save"></i> Salvar Taxas
+                </button>
+              </div>
+
+              <!-- Bloco 2: Operações -->
+              <div class="panel-block">
+                <h3>Operações Financeiras</h3>
+                <div class="input-row">
+                  <div class="input-group">
+                    <label for="deposito">Depósito (R$):</label>
+                    <input
+                      type="number"
+                      id="deposito"
+                      value=""
+                      min="0"
+                      step="0.01"
+                      placeholder="0,00"
+                    />
+                  </div>
+
+                  <div class="input-group">
+                    <label for="saque">Saque (R$):</label>
+                    <input
+                      type="number"
+                      id="saque"
+                      value=""
+                      min="0"
+                      step="0.01"
+                      placeholder="0,00"
+                    />
+                  </div>
+                </div>
+
+                <button id="executar-operacao" class="btn-secondary">
+                  <i class="fas fa-exchange-alt"></i> Executar Operação
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gráfico de Distribuição de Resultados -->
+          <div class="distribution-chart-container">
+            <h3>Distribuição de Resultados</h3>
+            <div class="distribution-charts-grid">
+              <div class="chart-placeholder">
+                <canvas id="distribution-chart"></canvas>
+              </div>
+              <div class="chart-placeholder">
+                <canvas id="distribution-chart-2"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lançamentos Diários -->
+        <div class="daily-entries">
+        <h2>Lançamentos de Todos os Trades</h2>
+
+        <div class="input-group">
+          <label for="data">Data:</label>
+          <div class="date-input">
+            <input type="date" id="data" />
+            <i class="fas fa-calendar"></i>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="resultado">Resultado Bruto (R$):</label>
+          <input
+            type="number"
+            id="resultado"
+            placeholder="Ex: 150 ou -75"
+            step="0.01"
+          />
+        </div>
+
+        <div class="input-row contract-selection">
+          <div class="contract-option">
+            <input type="radio" id="tipo-wdo" name="tipo-contrato" checked />
+            <label for="tipo-wdo">WDO</label>
+            <input
+              type="number"
+              id="quantidade-wdo"
+              class="contract-quantity"
+              min="1"
+              value="0"
+              placeholder="Qtd."
+            />
+          </div>
+
+          <div class="contract-option">
+            <input type="radio" id="tipo-win" name="tipo-contrato" />
+            <label for="tipo-win">WIN</label>
+            <input
+              type="number"
+              id="quantidade-win"
+              class="contract-quantity"
+              min="1"
+              value="0"
+              placeholder="Qtd."
+            />
+          </div>
+
+          <div class="contract-option">
+            <input type="radio" id="tipo-bit" name="tipo-contrato" />
+            <label for="tipo-bit">BIT</label>
+            <input
+              type="number"
+              id="quantidade-bit"
+              class="contract-quantity"
+              min="1"
+              value="0"
+              placeholder="Qtd."
+            />
+          </div>
+        </div>
+
+        <button id="adicionar-lancamento" class="btn-primary">
+          <i class="fas fa-plus"></i> Adicionar Lançamento
+        </button>
+
+        <!-- Lista de Lançamentos -->
+        <div class="lancamentos-list">
+          <div class="list-header">
+            <h3>Lançamentos do Mês</h3>
+            <div class="month-filter">
+              <select id="month-selector" class="month-select">
+                <option value="0">Todos os Meses</option>
+                <option value="1">Janeiro</option>
+                <option value="2">Fevereiro</option>
+                <option value="3">Março</option>
+                <option value="4">Abril</option>
+                <option value="5">Maio</option>
+                <option value="6">Junho</option>
+                <option value="7">Julho</option>
+                <option value="8" selected>Agosto</option>
+                <option value="9">Setembro</option>
+                <option value="10">Outubro</option>
+                <option value="11">Novembro</option>
+                <option value="12">Dezembro</option>
+              </select>
+            </div>
+          </div>
+          <div class="extrato">
+            <div id="lista-lancamentos"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Análise de Performance -->
+    <div class="full-width-container">
+      <div class="performance-analysis">
+        <h2>Análise de Performance</h2>
+        <div class="chart-placeholder">
+          <canvas id="balance-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumo do Mês -->
+    <div class="full-width-container">
+      <div class="monthly-summary">
+        <div class="summary-header">
+          <h2>Resumo do Mês</h2>
+        </div>
+
+        <div class="summary-stats">
+          <div class="stat-item">
+            <label>Ganho/Perda Total:</label>
+            <span id="ganho-perda-mes" class="display-value">R$ 0,00</span>
+          </div>
+          <div class="stat-item">
+            <label>Total de Trades:</label>
+            <span id="total-trades" class="display-value">0</span>
+          </div>
+          <div class="stat-item">
+            <label>Taxa de Sucesso:</label>
+            <span id="taxa-sucesso" class="display-value">0%</span>
+          </div>
+          <div class="stat-item">
+            <label>Maior Ganho:</label>
+            <span id="maior-ganho" class="display-value positive">R$ 0,00</span>
+          </div>
+          <div class="stat-item">
+            <label>Maior Perda:</label>
+            <span id="maior-perda" class="display-value negative">R$ 0,00</span>
+          </div>
+          <div class="stat-item">
+            <label>Média por Trade:</label>
+            <span id="media-trade" class="display-value">R$ 0,00</span>
+          </div>
+        </div>
+
+        <div id="mensagem-sem-dados" class="no-data-message">
+          Nenhum lançamento registrado.
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+
+    <!-- Scripts da Aplicação -->
     <script type="module" src="../src/main.js"></script>
+
   </body>
 </html>

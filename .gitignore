@@ -7,3 +7,6 @@ node_modules/
 # Ignora arquivos de log e temporários
 *.log
 tmp/
+
+# Ignora variáveis de ambiente (chaves secretas)
+.env
